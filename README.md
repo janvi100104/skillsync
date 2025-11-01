@@ -1,70 +1,185 @@
-# Getting Started with Create React App
+# SkillSync - Web3 Skill Badges Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+SkillSync is a Web3 platform that allows users to mint and showcase verifiable skill badges on the blockchain. Built with Next.js 14, RainbowKit, Wagmi, and Tailwind CSS.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+1. **Wallet Connection**: Connect your wallet via RainbowKit + Wagmi
+2. **Mint Badges**: Mint NFT badges by calling Kwala workflow endpoints
+3. **Display Badges**: Fetch and display badges owned by your wallet
+4. **Responsive UI**: Mobile-friendly design with Tailwind CSS
+5. **Animations**: Smooth animations with Framer Motion
+6. **Toast Notifications**: User feedback for actions
+7. **Confetti Animations**: Celebration effects when minting badges
+8. **Badge Gallery**: Public showcase of all badges in the system
+9. **Badge Details Modal**: Click on any badge to see detailed information
+10. **Social Sharing**: Share your badges on Twitter, LinkedIn, or copy the link
+11. **Leaderboard**: See top badge earners in the community
+12. **User Profiles**: Customize your profile with bio and social links
+13. **Search & Filter**: Find badges by name, category, or level
+14. **Achievement System**: Multiple badge levels (Beginner to Expert)
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Next.js 14** (App Router)
+- **RainbowKit + Wagmi + viem** for wallet integration
+- **Tailwind CSS** for styling
+- **axios** for API calls
+- **Framer Motion** for animations
+- **Lucide-react** for icons
+- **shadcn/ui** for UI components
+- **canvas-confetti** for celebration effects
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- Node.js 16.8 or later
+- npm, yarn, or pnpm
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup Instructions
 
-### `npm run build`
+### 1. Install Dependencies
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 2. Environment Variables
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Create a `.env.local` file in the root directory with the following variables:
 
-### `npm run eject`
+```env
+NEXT_PUBLIC_KWALA_MINT_URL=https://api.kwala.xyz/workflow/MintSkillBadge
+NEXT_PUBLIC_KWALA_FETCH_URL=https://api.kwala.xyz/workflow/GetUserBadges
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 3. Run Development Server
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run dev
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 4. Build for Production
 
-## Learn More
+```bash
+npm run build
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 5. Start Production Server
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm start
+```
 
-### Code Splitting
+## Usage Guide
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Connect Wallet
 
-### Analyzing the Bundle Size
+1. Visit the homepage
+2. Click "Connect Wallet" button
+3. Select your preferred wallet provider
+4. Approve the connection request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Mint a Badge
 
-### Making a Progressive Web App
+1. Navigate to the "Mint Badge" page
+2. Select your desired badge level (Beginner, Intermediate, Advanced, Expert)
+3. Click the "Earn Badge" button
+4. Confirm the transaction in your wallet
+5. Enjoy the confetti celebration!
+6. View your new badge in the Dashboard
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### View Badges
 
-### Advanced Configuration
+1. Navigate to the "Dashboard" page
+2. All badges owned by your connected wallet will be displayed
+3. Click on any badge to see detailed information
+4. Share your badges on social media
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Explore Gallery
 
-### Deployment
+1. Visit the "Gallery" page
+2. Browse all badges in the system
+3. Use search and filter options to find specific badges
+4. Click on badges to see details
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Check Leaderboard
 
-### `npm run build` fails to minify
+1. Navigate to the "Leaderboard" page
+2. See the top badge earners in the community
+3. Get inspired to earn more badges
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Customize Profile
+
+1. Go to your "Profile" page (accessible after connecting wallet)
+2. Edit your name, bio, website, and social links
+3. Save your profile changes
+4. View your badges in your profile
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx               # Home page
+│   ├── dashboard/page.tsx     # Dashboard page
+│   ├── mint/page.tsx          # Mint Badge page
+│   ├── gallery/page.tsx       # Badge gallery
+│   ├── leaderboard/page.tsx   # Community leaderboard
+│   ├── profile/page.tsx       # User profile
+│   └── layout.tsx             # Root layout
+├── components/
+│   ├── BadgeCard.tsx          # Badge display component
+│   ├── BadgeModal.tsx         # Badge details modal
+│   ├── Navbar.tsx             # Navigation bar
+│   ├── Providers.tsx          # Wagmi/RainbowKit providers
+│   └── ui/                    # shadcn/ui components
+├── utils/
+│   └── kwala.ts               # Kwala API helpers
+├── types/
+│   └── index.ts               # TypeScript types
+└── lib/
+    └── utils.ts               # Utility functions
+```
+
+## API Integration
+
+The application integrates with Kwala workflows:
+
+1. **MintSkillBadge**: `POST https://api.kwala.xyz/workflow/MintSkillBadge`
+2. **GetUserBadges**: `GET https://api.kwala.xyz/workflow/GetUserBadges`
+
+## Customization
+
+### Styling
+
+The application uses Tailwind CSS for styling. You can customize the theme in `tailwind.config.js`.
+
+### Wallet Configuration
+
+Wallet connection settings can be modified in `src/components/Providers.tsx`.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Wallet connection fails**: Ensure you have a Web3 wallet installed (MetaMask, Rainbow, etc.)
+2. **API calls failing**: Check your environment variables and network connectivity
+3. **Animations not working**: Verify Framer Motion is properly installed
+
+### Support
+
+For issues, please open a GitHub issue or contact the development team.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
+
+## License
+
+This project is licensed under the MIT License.
