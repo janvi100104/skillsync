@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { BadgeInfo } from '@/types';
 
 // Get environment variables
@@ -8,27 +8,35 @@ const FETCH_URL = process.env.NEXT_PUBLIC_KWALA_FETCH_URL || 'https://api.kwala.
 /**
  * Mint a new skill badge for the user
  * @param walletAddress The user's wallet address
+ * @param level The badge level (beginner, intermediate, advanced, expert)
  * @returns The minted badge information
  */
-export async function mintBadge(walletAddress: string): Promise<BadgeInfo> {
+export async function mintBadge(walletAddress: string, level: string = 'intermediate'): Promise<BadgeInfo> {
   try {
-    // In a real implementation, this would call the actual API
-    // For demo purposes, we'll simulate a successful response
-    console.log('Minting badge for wallet:', walletAddress);
+    console.log('Minting badge for wallet:', walletAddress, 'at level:', level);
     
-    // Return sample badge data
-    return {
-      id: Math.random().toString(36).substring(2, 9),
-      name: 'Web3 Developer',
-      description: 'Verified skills in blockchain development and smart contracts',
-      image: '',
-      date: new Date().toISOString(),
-      category: 'Development',
-      level: 'Intermediate'
-    };
-  } catch (error) {
-    console.error('Error minting badge:', error);
-    throw new Error('Failed to mint badge');
+    // Call the actual Kwala workflow
+    const response = await axios.post(MINT_URL, {
+      walletAddress,
+      level,
+      skill: 'Web3 Developer',
+      date: new Date().toISOString()
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    // Return the badge data from the API response
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error minting badge:', error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || 'Failed to mint badge');
+    } else {
+      console.error('Unexpected error:', error);
+      throw new Error('Failed to mint badge');
+    }
   }
 }
 
@@ -39,43 +47,21 @@ export async function mintBadge(walletAddress: string): Promise<BadgeInfo> {
  */
 export async function getBadges(walletAddress: string): Promise<BadgeInfo[]> {
   try {
-    // In a real implementation, this would call the actual API
-    // For demo purposes, we'll simulate a successful response with sample data
     console.log('Fetching badges for wallet:', walletAddress);
     
-    // Return sample badges data
-    return [
-      {
-        id: '1',
-        name: 'Web3 Developer',
-        description: 'Verified skills in blockchain development and smart contracts',
-        image: '',
-        date: '2023-06-15',
-        category: 'Development',
-        level: 'Intermediate'
-      },
-      {
-        id: '2',
-        name: 'Smart Contract Auditor',
-        description: 'Expert in reviewing and securing smart contracts',
-        image: '',
-        date: '2023-07-22',
-        category: 'Security',
-        level: 'Advanced'
-      },
-      {
-        id: '3',
-        name: 'DeFi Specialist',
-        description: 'Mastery in decentralized finance protocols and mechanisms',
-        image: '',
-        date: '2023-08-05',
-        category: 'Finance',
-        level: 'Expert'
-      }
-    ];
-  } catch (error) {
-    console.error('Error fetching badges:', error);
-    // Return empty array as fallback instead of throwing error
-    return [];
+    // Call the actual Kwala workflow
+    const response = await axios.get(`${FETCH_URL}?walletAddress=${encodeURIComponent(walletAddress)}`);
+    
+    // Return the badges data from the API response
+    return response.data.badges || response.data || [];
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error fetching badges:', error.response?.data || error.message);
+      // Return empty array as fallback instead of throwing error
+      return [];
+    } else {
+      console.error('Unexpected error:', error);
+      return [];
+    }
   }
 }

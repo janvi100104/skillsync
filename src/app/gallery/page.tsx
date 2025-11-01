@@ -6,7 +6,8 @@ import { Navbar } from '@/components/Navbar';
 import { BadgeCard } from '@/components/BadgeCard';
 import { BadgeModal } from '@/components/BadgeModal';
 import { BadgeInfo } from '@/types';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Grid, List, Trophy, Users, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Gallery() {
   const [badges, setBadges] = useState<BadgeInfo[]>([]);
@@ -16,6 +17,8 @@ export default function Gallery() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
+  const [sortBy, setSortBy] = useState('date');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [categories, setCategories] = useState<string[]>(['All']);
   const [isClient, setIsClient] = useState(false);
 
@@ -100,6 +103,24 @@ export default function Gallery() {
           date: '2023-12-18',
           category: 'Finance',
           level: 'Advanced'
+        },
+        {
+          id: '9',
+          name: 'Layer 2 Wizard',
+          description: 'Master of scaling solutions and Layer 2 protocols',
+          image: '',
+          date: '2024-01-10',
+          category: 'Scalability',
+          level: 'Expert'
+        },
+        {
+          id: '10',
+          name: 'Wallet Security Pro',
+          description: 'Expert in wallet security and key management',
+          image: '',
+          date: '2024-01-22',
+          category: 'Security',
+          level: 'Advanced'
         }
       ];
       
@@ -125,15 +146,41 @@ export default function Gallery() {
     }
   }, [isClient]);
 
-  // Filter badges based on search term and category
-  const filteredBadges = useMemo(() => {
-    return badges.filter(badge => {
-      const matchesSearch = badge.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           badge.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = filterCategory === 'All' || badge.category === filterCategory;
-      return matchesSearch && matchesCategory;
+  // Filter and sort badges
+  const filteredAndSortedBadges = useMemo(() => {
+    let result = [...badges];
+    
+    // Filter by search term
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(badge => 
+        badge.name.toLowerCase().includes(term) || 
+        badge.description.toLowerCase().includes(term) ||
+        (badge.category && badge.category.toLowerCase().includes(term))
+      );
+    }
+    
+    // Filter by category
+    if (filterCategory !== 'All') {
+      result = result.filter(badge => badge.category === filterCategory);
+    }
+    
+    // Sort badges
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'date':
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        case 'category':
+          return (a.category || '').localeCompare(b.category || '');
+        default:
+          return 0;
+      }
     });
-  }, [badges, searchTerm, filterCategory]);
+    
+    return result;
+  }, [badges, searchTerm, filterCategory, sortBy]);
 
   const handleBadgeClick = (badge: BadgeInfo) => {
     setSelectedBadge(badge);
@@ -150,16 +197,77 @@ export default function Gallery() {
     return null;
   }
 
+  // Stats for the gallery
+  const totalBadges = badges.length;
+  const uniqueCategories = [...new Set(badges.map(b => b.category).filter(Boolean))].length;
+  const latestBadgeDate = badges.length > 0 
+    ? new Date(Math.max(...badges.map(b => new Date(b.date).getTime()))).toLocaleDateString()
+    : 'N/A';
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Badge Gallery</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
-            Explore the skill badges earned by our community
-          </p>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Badge Gallery</h1>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
+                Explore skill badges earned by our community
+              </p>
+            </div>
+            <div className="mt-4 flex space-x-3 md:mt-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+              >
+                {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
+                {viewMode === 'grid' ? 'List View' : 'Grid View'}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-3">
+          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/30">
+                <Trophy className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Badges</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">{totalBadges}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="rounded-full bg-green-100 p-2 dark:bg-green-900/30">
+                <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Categories</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">{uniqueCategories}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="rounded-full bg-purple-100 p-2 dark:bg-purple-900/30">
+                <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Latest Badge</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">{latestBadgeDate}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Search and Filter Controls */}
@@ -193,6 +301,19 @@ export default function Gallery() {
                 ))}
               </select>
             </div>
+            
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                title="Sort badges"
+              >
+                <option value="date">Sort by Date</option>
+                <option value="name">Sort by Name</option>
+                <option value="category">Sort by Category</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -203,28 +324,31 @@ export default function Gallery() {
         ) : error ? (
           <div className="rounded-lg bg-red-50 p-4 text-center dark:bg-red-900/20">
             <p className="text-red-800 dark:text-red-200">{error}</p>
-            <button
+            <Button
               onClick={fetchAllBadges}
-              className="mt-4 rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+              className="mt-4"
             >
               Retry
-            </button>
+            </Button>
           </div>
-        ) : filteredBadges.length === 0 ? (
-          <div className="rounded-lg bg-white p-8 text-center shadow dark:bg-gray-800">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">No badges found</h3>
-            <p className="mt-1 text-gray-500 dark:text-gray-400">
+        ) : filteredAndSortedBadges.length === 0 ? (
+          <div className="rounded-lg bg-white p-12 text-center shadow dark:bg-gray-800">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+              <Search className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No badges found</h3>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               Try adjusting your search or filter criteria
             </p>
           </div>
-        ) : (
+        ) : viewMode === 'grid' ? (
           <motion.div 
-            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            {filteredBadges.map((badge, index) => (
+            {filteredAndSortedBadges.map((badge, index) => (
               <motion.div
                 key={badge.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -235,6 +359,43 @@ export default function Gallery() {
               </motion.div>
             ))}
           </motion.div>
+        ) : (
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+              {filteredAndSortedBadges.map((badge, index) => (
+                <motion.li
+                  key={badge.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={() => handleBadgeClick(badge)}
+                >
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                        <Trophy className="h-8 w-8" />
+                      </div>
+                    </div>
+                    <div className="ml-4 flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white">{badge.name}</h3>
+                        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          {badge.level}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{badge.description}</p>
+                      <div className="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <span>{badge.category}</span>
+                        <span className="mx-2">•</span>
+                        <span>{new Date(badge.date).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
         )}
       </main>
       
