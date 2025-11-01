@@ -15,8 +15,11 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
 
+  // This is a necessary pattern for handling hydration issues in Next.js
+  // The effect only runs on the client side after mount
   useEffect(() => {
     setIsClient(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -27,11 +30,14 @@ export default function Home() {
 
   // Auto-rotate features
   useEffect(() => {
+    if (!isClient) return;
+    
     const interval = setInterval(() => {
       setActiveFeature(prev => (prev + 1) % 3);
     }, 3000);
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [isClient]);
 
   // Confetti effect for CTA button
   const triggerConfetti = () => {
@@ -250,7 +256,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-3 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 gap-8 md:gap-12 md:grid-cols-3 max-w-5xl mx-auto">
             {[
               {
                 icon: <Zap className="h-8 w-8" />,
@@ -270,50 +276,64 @@ export default function Home() {
             ].map((item, index) => (
               <motion.div
                 key={index}
-                className="text-center relative"
+                className="relative group"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
               >
-                <div className="relative mb-8">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 rounded-full bg-blue-500/10 flex items-center justify-center"></div>
-                  </div>
-                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto shadow-lg">
-                    <div className="text-white">
-                      {item.icon}
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-700 h-full">
+                  <div className="relative mb-8">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-24 h-24 rounded-full bg-blue-500/5 group-hover:bg-blue-500/10 transition-all duration-300 flex items-center justify-center"></div>
                     </div>
-                    <motion.div 
-                      className="absolute inset-0 rounded-full border-4 border-blue-400"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 0, 0.5]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: index * 0.5
-                      }}
-                    ></motion.div>
+                    <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                      <div className="text-white">
+                        {item.icon}
+                      </div>
+                      <motion.div 
+                        className="absolute inset-0 rounded-full border-4 border-blue-400"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 0, 0.5]
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          delay: index * 0.5
+                        }}
+                      ></motion.div>
+                    </div>
+                    <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg border-4 border-white dark:border-gray-800 shadow-lg">
+                      0{index + 1}
+                    </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                    {index + 1}
+                  
+                  <motion.h3 
+                    className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300"
+                    whileHover={{ scale: 1.03 }}
+                  >
+                    {item.title}
+                  </motion.h3>
+                  
+                  <p className="text-gray-600 dark:text-gray-300 text-lg">
+                    {item.description}
+                  </p>
+                  
+                  <div className="mt-6 flex justify-center">
+                    <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"></div>
                   </div>
                 </div>
-                
-                <motion.h3 
-                  className="text-2xl font-bold text-gray-900 dark:text-white mb-4"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  {item.title}
-                </motion.h3>
-                
-                <p className="text-gray-600 dark:text-gray-300 text-lg">
-                  {item.description}
-                </p>
               </motion.div>
             ))}
+          </div>
+          
+          {/* Connecting line for desktop */}
+          <div className="hidden md:block absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/3 h-1">
+            <div className="relative h-full">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-indigo-600/20 rounded-full"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse"></div>
+            </div>
           </div>
         </div>
       </div>

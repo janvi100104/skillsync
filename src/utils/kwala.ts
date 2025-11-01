@@ -49,18 +49,39 @@ export async function getBadges(walletAddress: string): Promise<BadgeInfo[]> {
   try {
     console.log('Fetching badges for wallet:', walletAddress);
     
+    // Check if wallet address is provided
+    if (!walletAddress) {
+      console.warn('No wallet address provided for badge fetching');
+      return [];
+    }
+    
+    // Validate the URL
+    if (!FETCH_URL || FETCH_URL === 'undefined') {
+      console.error('FETCH_URL is not properly configured');
+      return [];
+    }
+    
     // Call the actual Kwala workflow
-    const response = await axios.get(`${FETCH_URL}?walletAddress=${encodeURIComponent(walletAddress)}`);
+    const response = await axios.get(`${FETCH_URL}?walletAddress=${encodeURIComponent(walletAddress)}`, {
+      timeout: 10000 // 10 second timeout
+    });
     
     // Return the badges data from the API response
     return response.data.badges || response.data || [];
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error('Error fetching badges:', error.response?.data || error.message);
+      // More detailed error logging
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNABORTED') {
+        console.error('Network error while fetching badges:', error.message);
+      } else if (error.response) {
+        console.error('API error while fetching badges:', error.response.status, error.response.data);
+      } else {
+        console.error('Error fetching badges:', error.message);
+      }
       // Return empty array as fallback instead of throwing error
       return [];
     } else {
-      console.error('Unexpected error:', error);
+      console.error('Unexpected error while fetching badges:', error);
       return [];
     }
   }
